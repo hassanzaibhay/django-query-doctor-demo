@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+
+<h2>Profile</h2>
+<!-- BUG TRIGGER: Duplicate profile queries from view -->
+<p>Phone: {{ phone }}</p>
+<p>Newsletter: {{ newsletter|yesno:"Subscribed,Not subscribed" }}</p>
+
+<h2>Recent Orders</h2>
+{% for order in recent_orders %}
+<div class="order-card">
+    <h3><a href="{% url 'shop:order-detail' order.pk %}">Order #{{ order.pk }}</a></h3>
+    <p class="meta">{{ order.get_status_display }} | ${{ order.total }} | {{ order.created_at|date:"M d, Y" }}</p>
+    <!-- BUG TRIGGER: N+1 on order.items -->
+    <p>{{ order.items.all|length }} items</p>
+</div>
+{% endfor %}
+
+<h2>Addresses</h2>
+{% for addr in addresses %}
+<p>
+    <strong>{{ addr.label }}{% if addr.is_default %} (Default){% endif %}:</strong>
+    {{ addr.street }}, {{ addr.city }}, {{ addr.state }} {{ addr.zip_code }}
+</p>
+{% endfor %}
+
+<h2>Activity ({{ activity_count }} total)</h2>
+{% for log in recent_activity %}
+<p class="meta">{{ log.action }} — {{ log.created_at|date:"M d, Y H:i" }}</p>
+{% endfor %}
+{% endblock %}

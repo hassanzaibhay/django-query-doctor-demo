@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+<h1>{{ product.name }}</h1>
+<!-- BUG TRIGGER: Accessing product.category triggers duplicate query -->
+<p class="meta">Category: {{ product.category.name }} | SKU: {{ product.sku }}</p>
+<p>{{ product.description }}</p>
+<p><strong>${{ product.price }}</strong> — {{ product.stock }} in stock</p>
+
+<h2>Average Rating: <span class="rating">{{ avg_rating|floatformat:1 }}/5</span></h2>
+
+<h2>Reviews</h2>
+{% for review in reviews %}
+<div class="product-card">
+    <p class="rating">{{ review.rating }}★</p>
+    <h3>{{ review.title }}</h3>
+    <!-- BUG TRIGGER: N+1 on review.user -->
+    <p class="meta">By {{ review.user.username }} on {{ review.created_at|date:"M d, Y" }}</p>
+    <p>{{ review.body }}</p>
+</div>
+{% endfor %}
+
+{% if related_products %}
+<h2>Related Products</h2>
+{% for product in related_products %}
+<div class="product-card">
+    <a href="{% url 'shop:product-detail' product.slug %}">{{ product.name }}</a> — ${{ product.price }}
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

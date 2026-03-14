@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+{% block content %}
+<h1>Order #{{ order.pk }}</h1>
+<!-- BUG TRIGGER: Accessing order.user triggers duplicate query -->
+<p class="meta">Placed by {{ order.user.username }} on {{ order.created_at|date:"M d, Y" }}</p>
+<p>Status: {{ order.get_status_display }}</p>
+
+{% if user_address %}
+<h2>Shipping Address</h2>
+<p>{{ user_address.street }}, {{ user_address.city }}, {{ user_address.state }} {{ user_address.zip_code }}</p>
+{% endif %}
+
+<h2>Items</h2>
+<table>
+    <tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th></tr>
+    <!-- BUG TRIGGER: Fat SELECT on items, accessing product FK -->
+    {% for item in items %}
+    <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>${{ item.unit_price }}</td>
+        <td>${{ item.unit_price }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<p><strong>Total: ${{ order.total }}</strong></p>
+
+{% if order.notes %}
+<h2>Notes</h2>
+<p>{{ order.notes }}</p>
+{% endif %}
+{% endblock %}

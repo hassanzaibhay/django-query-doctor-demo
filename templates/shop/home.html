@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}ShopBlog — Home{% endblock %}
+{% block content %}
+<h1>Welcome to ShopBlog</h1>
+
+<h2>Featured Products</h2>
+{% for product in featured_products %}
+<div class="product-card">
+    <h3><a href="{% url 'shop:product-detail' product.slug %}">{{ product.name }}</a></h3>
+    <!-- BUG TRIGGER: Accessing FK without select_related -->
+    <p>Category: {{ product.category.name }}</p>
+    <p>By: {{ product.created_by.username }}</p>
+    <p>${{ product.price }}</p>
+</div>
+{% endfor %}
+
+<h2>Categories</h2>
+{% for category in all_categories %}
+    <a href="{% url 'shop:category-detail' category.slug %}">{{ category.name }}</a>
+{% endfor %}
+{% endblock %}

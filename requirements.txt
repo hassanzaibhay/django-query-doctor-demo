@@ -1,0 +1,5 @@
+django>=5.2
+djangorestframework>=3.15
+django-query-doctor>=1.0.0
+factory-boy>=3.3
+Faker>=28.0

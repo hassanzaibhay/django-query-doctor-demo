@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Activity Log{% endblock %}
+{% block content %}
+<h1>Activity Log</h1>
+
+<table>
+    <tr><th>User</th><th>Action</th><th>IP Address</th><th>Date</th></tr>
+    {% for log in logs %}
+    <tr>
+        <!-- BUG TRIGGER: N+1 on log.user -->
+        <td>{{ log.user.username }}</td>
+        <td>{{ log.action }}</td>
+        <td>{{ log.ip_address }}</td>
+        <td>{{ log.created_at|date:"M d, Y H:i" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<h1>Users</h1>
+
+<table>
+    <tr><th>Username</th><th>Name</th><th>Email</th><th>Orders</th><th>Total Spend</th><th>Joined</th></tr>
+    {% for stat in user_stats %}
+    <tr>
+        <td>{{ stat.user.username }}</td>
+        <!-- BUG TRIGGER: N+1 on user.profile -->
+        <td>{{ stat.user.get_full_name }}</td>
+        <td>{{ stat.user.email }}</td>
+        <td>{{ stat.order_count }}</td>
+        <td>${{ stat.total_spend }}</td>
+        <td>{{ stat.user.date_joined|date:"M d, Y" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

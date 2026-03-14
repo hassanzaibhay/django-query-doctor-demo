@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<h1>Products ({{ total_products }} total)</h1>
+
+<div style="margin-bottom: 1rem;">
+    <strong>Filter by category:</strong>
+    {% for cat in categories %}
+        <a href="?category={{ cat.slug }}">{{ cat.name }}</a>
+    {% endfor %}
+</div>
+
+{% for product in products %}
+<div class="product-card">
+    <h3><a href="{% url 'shop:product-detail' product.slug %}">{{ product.name }}</a></h3>
+    <!-- BUG TRIGGER: N+1 on category and created_by -->
+    <p class="meta">Category: {{ product.category.name }} | By: {{ product.created_by.username }}</p>
+    <p>${{ product.price }} — {{ product.stock }} in stock</p>
+</div>
+{% endfor %}
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

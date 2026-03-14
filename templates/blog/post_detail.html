@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<h1>{{ post.title }}</h1>
+<!-- BUG TRIGGER: Accessing post.author.user -->
+<p class="meta">
+    By <a href="{% url 'blog:author-detail' post.author.pk %}">{{ post.author.user.get_full_name }}</a>
+    | {{ post.published_at|date:"M d, Y" }}
+    | {{ post.view_count }} views
+</p>
+
+<div style="margin: 1rem 0;">
+    <!-- BUG TRIGGER: N+1 on M2M tags -->
+    {% for tag in post_tags %}
+        <a href="{% url 'blog:tag-detail' tag.slug %}" class="tag">{{ tag.name }}</a>
+    {% endfor %}
+</div>
+
+<div style="margin: 2rem 0;">
+    {{ post.body|linebreaks }}
+</div>
+
+{% if related_posts %}
+<h2>Related Posts</h2>
+{% for related in related_posts %}
+<div class="post-card">
+    <a href="{% url 'blog:post-detail' related.slug %}">{{ related.title }}</a>
+    <span class="meta">{{ related.published_at|date:"M d, Y" }}</span>
+</div>
+{% endfor %}
+{% endif %}
+
+<h2>Comments ({{ comments|length }})</h2>
+{% for comment in comments %}
+<div class="product-card">
+    <!-- BUG TRIGGER: N+1 on comment.user -->
+    <p class="meta">{{ comment.user.username }} — {{ comment.created_at|date:"M d, Y H:i" }}</p>
+    <p>{{ comment.body }}</p>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }}{% endblock %}
+{% block content %}
+<h1>{{ category.name }}</h1>
+{% if category.description %}
+<p>{{ category.description }}</p>
+{% endif %}
+
+<h2>Products</h2>
+{% for product in products %}
+<div class="product-card">
+    <h3><a href="{% url 'shop:product-detail' product.slug %}">{{ product.name }}</a></h3>
+    <p>${{ product.price }}</p>
+    <!-- BUG TRIGGER: N+1 on M2M tags for each product -->
+    <p>
+        {% for tag in product.tags.all %}
+            <span class="tag">{{ tag.name }}</span>
+        {% endfor %}
+    </p>
+</div>
+{% endfor %}
+{% endblock %}

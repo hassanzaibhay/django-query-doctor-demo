@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Django
+db.sqlite3
+*.log
+staticfiles/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project
+CLAUDE.md
+.claude/
+.claudeignore
+
+# Reports
+query_doctor_report.html
+*.bak
