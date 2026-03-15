@@ -20,10 +20,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
+        # Auto-create profile if missing (handles existing users without one)
+        profile, _ = Profile.objects.get_or_create(user=user)
+
         # BUG: Duplicate query — user.profile accessed multiple times
-        context["profile"] = user.profile
-        context["phone"] = user.profile.phone
-        context["newsletter"] = user.profile.newsletter_subscribed
+        context["profile"] = profile
+        context["phone"] = profile.phone
+        context["newsletter"] = profile.newsletter_subscribed
 
         # BUG: N+1 — template iterates orders and accesses order.items.all()
         context["recent_orders"] = user.orders.all().order_by("-created_at")[:5]

@@ -79,6 +79,12 @@ class Command(BaseCommand):
         self._create_reviews(products, users)
         self._create_activity_logs(users)
 
+        # Ensure all users have profiles (handles pre-existing users)
+        from accounts.models import Profile as ProfileModel
+        for user in User.objects.filter(profile__isnull=True):
+            ProfileModel.objects.create(user=user)
+            self.stdout.write(f"  Created missing profile for {user.username}")
+
         self.stdout.write(self.style.SUCCESS(
             f"Done! Created {len(users)} users, {len(products)} products, "
             f"{len(posts)} posts, {options['orders']} orders"
